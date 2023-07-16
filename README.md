@@ -23,7 +23,7 @@ https://www.figma.com/file/aXz2MsLlfevUp06BA54AE1/MOVIBE-(Community)?type=design
 
   ## Thanks to all Contributors
 
-[![Contributors](https://contrib.rocks/image?repo=jellyjul/ENGLISH_SCHOOL)](https://github.com/jellyjul/ENGLISH_SCHOOL/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=otter00/js-team-project)](https://github.com/otter00/js-team-project/graphs/contributors)
 
 ## Result:
 `GitHub Pages link:` https://otter00.github.io/js-team-project/
