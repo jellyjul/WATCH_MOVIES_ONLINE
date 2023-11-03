@@ -2,7 +2,7 @@
 
 - A website for watching HD Movies online and Stream latest tv-series
 
-`GitHub Pages link:` https://otter00.github.io/js-team-project/
+`GitHub Pages link:` https://jellyjul.github.io/WATCH_MOVIES_ONLINE/
 <img width="700" alt="Screenshot" src="./assets/images/screens/1.png"/>
 <img width="700" alt="Screenshot" src="./assets/images/screens/2.png"/>
 <img width="700" alt="Screenshot" src="./assets/images/screens/3.png"/>
