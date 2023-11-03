@@ -1,12 +1,247 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.header__burger').addEventListener('click', () => {
+        document.querySelector('.header__burger').classList.toggle('active');
+        document.querySelector('.header__menu').classList.toggle('active');
+    })
+});
+},{}],2:[function(require,module,exports){
+/*      AUTHORIZATION CHANGE        */
+
+let button = document.querySelector(".login-form__btn");
+let form = document.querySelector('#login__form');
+let inputField = document.querySelectorAll('input');
+let closeButton = document.querySelector('.js-close-button');
+let noAccount = document.querySelector('.no-account');
+
+let errors = [];
+
+noAccount.addEventListener('click', ()=>{
+    window.location.href = 'htmls/signup.html';
+});
+
+closeButton.addEventListener('click', ()=>{
+    window.location.href = 'htmls/main.html';
+});
+
+//Проверка для каждого поля (поля получаем по одному в функции ниже в цикле)
+function checkValidity(input) {
+    let validity = input.validity;
+    let inpName = input.name;
+
+    if (input.value == "") {
+        errors.push(`Поле ${inpName} не заполнено`); }
+
+    if (validity.patternMismatch) 
+		{ errors.push(`Неверный формат заполнения ${inpName}`); }
+    
+		if (validity.tooLong) 
+		{ let maxlength = input.maxLength;
+			errors.push(`Слишком длинное значение ${inpName}! Максимальная длина:  ` + maxlength + `<br>`); }
+    
+		if (validity.tooShort) 
+		{ let minlength = input.minLength;
+			errors.push(`Слишком короткое значение ${inpName}! Минимальная длина: ` + minlength + `<br>`); }
+
+        if (validity = false) {
+            alert('Welcome!');
+        }
+}
+
+button.addEventListener('click', ()=>{
+//Проверка для всех полей
+	//получаем все инпуты
+    let inputs = document.querySelectorAll("input");
+
+    regexp = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/gi; 
+
+	//перебираем их и на каждый вызываем функцию валидации
+    for (let input of inputs) {
+        //console.log(input);
+        checkValidity(input);
+    }
+
+    if (!document.getElementById("email__input").value.match(regexp)) {
+        errors.push(`${document.getElementById("email__input").name} некорректно`);
+    }
+
+	//выводим ошибки в div 
+    let errorDiv = document.querySelector('.errors__info');
+    errorDiv.innerHTML = errors.join('\n');
+
+    if (errors.length == 0) {
+        alert(`Welcome, ${document.getElementById("email__input").value}`);
+        location.reload();//перезагружаем страницу, если всё введено корректно, 
+        //чтобы очистить поля для дальнейшего ввода
+        window.location.href = 'htmls/main.html';
+    }
+
+    errors = []; //чистим массив
+
+});
+},{}],3:[function(require,module,exports){
+//слайдер
+let slideIndex = 1;
+function showSlides(n) {
+    let i;
+    let slides = document.getElementsByClassName("slideshow__slides");
+    let dots = document.getElementsByClassName("slideshow__dot");
+    if (n > slides.length) {
+        slideIndex = 1
+    }
+    if (n < 1) {
+        slideIndex = slides.length
+    }
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+    for (i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active2", "");
+    }
+    slides[slideIndex - 1].style.display = "block";
+    dots[slideIndex - 1].className += " active2";
+}
+showSlides(slideIndex);
+function plusSlides(n) {
+    showSlides(slideIndex += n);
+}
+function currentSlide(n) {
+    showSlides(slideIndex = n);
+}
+
+//API с фильмами
+const API_key = '52NBSFR-B5S4KGW-JC6Y5XY-9KE3TWR';
+
+//Ссылка на payment.html в JSON'е, по-другому добавление через js не работает 
+var payRedirectLink = `[{
+    "link": "../htmls/payment.html"
+}]`;
+
+document.addEventListener("DOMContentLoaded", function (event) {
+    let moviesContent = "";
+    let payHref = JSON.parse(payRedirectLink); //payment.html link
+
+    fetch(`https://api.kinopoisk.dev/v1.3/movie?token=${API_key}&top250=!null&limit=10`)
+        .then(response => response.json())
+        .then(movie => {moviesContent = "";
+           for (let i = 0; i < 10; i++) { 
+                moviesContent += `
+                <div class = "movie">
+                    <p class="movie__year">Год: ${movie.docs[i].year}</p>
+                    <p class="movie__rating">Рейтинг: ${(movie.docs[i].rating.kp).toFixed(1)}</p>
+                    <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                    <div class = "movie2">
+                        <div>
+                            <p class="movie__name">${movie.docs[i].name}, ${movie.docs[i].year}</p>
+                            <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                            <p class="movie__description">${movie.docs[i].description}</p>
+                            <a href='${payHref[0].link}' class="movie__link">Смотреть</a>
+                        </div>
+                    </div>
+                </div>
+                `
+            }
+            document.querySelector(".movies__popular").innerHTML = moviesContent;
+        })
+        .catch(error => console.log(error));
+
+    fetch(`https://api.kinopoisk.dev/v1.3/movie?token=${API_key}&page=1&limit=10&genres.name=аниме`)
+        .then(response => response.json())
+        .then(movie => {
+            moviesContent = "";
+            for (let i = 0; i < 10; i++) {
+                moviesContent += `
+                <div class = "movie">
+                    <p class="movie__year">Год: ${movie.docs[i].year}</p>
+                    <p class="movie__rating">Рейтинг: ${(movie.docs[i].rating.kp).toFixed(1)}</p>
+                    <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                    <div class = "movie2">
+                        <div>
+                            <p class="movie__name">${movie.docs[i].name}, ${movie.docs[i].year}</p>
+                            <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                            <p class="movie__description">${movie.docs[i].description}</p>
+                            <a href='${payHref[0].link}' class="movie__link">Смотреть</a>
+                        </div>
+                    </div>
+                </div>
+                `
+            }
+            document.querySelector(".movies__anime").innerHTML = moviesContent;
+        })
+        .catch(error => console.log(error));
+
+    fetch(`https://api.kinopoisk.dev/v1.3/movie?token=${API_key}&page=1&limit=10&genres.name=фантастика`)
+        .then(response => response.json())
+        .then(movie => {
+            moviesContent = "";
+            for (let i = 0; i < 10; i++) {
+                moviesContent += `
+                <div class = "movie">
+                    <p class="movie__year">Год: ${movie.docs[i].year}</p>
+                    <p class="movie__rating">Рейтинг: ${(movie.docs[i].rating.kp).toFixed(1)}</p>
+                    <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                    <div class = "movie2">
+                        <div>
+                            <p class="movie__name">${movie.docs[i].name}, ${movie.docs[i].year}</p>
+                            <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                            <p class="movie__description">${movie.docs[i].description}</p>
+                            <a href='${payHref[0].link}' class="movie__link">Смотреть</a>
+                        </div>
+                    </div>
+                </div>
+                `
+            }
+            document.querySelector(".movies__fantastika").innerHTML = moviesContent;
+        })
+        .catch(error => console.log(error));
+
+    fetch(`https://api.kinopoisk.dev/v1.3/movie?token=${API_key}&page=3&limit=10&genres.name=драма`)
+        .then(response => response.json())
+        .then(movie => {
+            moviesContent = "";
+            for (let i = 0; i < 10; i++) {
+                moviesContent += `
+                <div class = "movie">
+                    <p class="movie__year">Год: ${movie.docs[i].year}</p>
+                    <p class="movie__rating">Рейтинг: ${(movie.docs[i].rating.kp).toFixed(1)}</p>
+                    <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                    <div class = "movie2">
+                        <div>
+                            <p class="movie__name">${movie.docs[i].name}, ${movie.docs[i].year}</p>
+                            <img class = "movie__img" src = ${movie.docs[i].poster.previewUrl}>
+                            <p class="movie__description">${movie.docs[i].description}</p>
+                            <a href='${payHref[0].link}' class="movie__link">Смотреть</a>
+                        </div>
+                    </div>
+                </div>
+                `
+            }
+            document.querySelector(".movies__drama").innerHTML = moviesContent;
+        })
+        .catch(error => console.log(error));
+})
+
+//Модальное окно
+const movieContainer = document.querySelector('.movies');
+movieContainer.addEventListener('click', (event) => {
+    if (event.target.classList.contains('movie__img')) {
+        const parentDiv = event.target.parentNode;
+        //console.log(parentDiv)
+        let movie2 = parentDiv.querySelector(".movie2");
+        movie2.style.display = "block";
+        window.onclick = function (event) {
+            if (event.target == movie2) {
+                movie2.style.display = "none";
+            }
+        }
+    }
+})
+},{}],4:[function(require,module,exports){
 const paymentBlock1 = document.querySelector('.block-one')
 const paymentBlock2 = document.querySelector('.block-two')
 const paymentBlock3 = document.querySelector('.block-three')
-
-
-//отображение цены при наведении на блоки
-//----хочу сократить функцию, но тогда при наведении отображаются сразу все три цены, а я хотела отдельно
 const blocks  = [paymentBlock1, paymentBlock2, paymentBlock3]
+
 const priceOnBlock1 = document.querySelector('.payment__on-click')
 const priceOnBlock2 = document.querySelector('.payment__on-click2')
 const priceOnBlock3 = document.querySelector('.payment__on-click3')
@@ -24,27 +259,6 @@ for (block of blocks) {
         priceOnBlock3.style.display = "none";
     })
 }
-// paymentBlock1.addEventListener('mouseover', function(){
-//     document.querySelector('.payment__on-click').style.display = "block";
-// })
-// paymentBlock1.addEventListener('mouseleave', function(){
-//     document.querySelector('.payment__on-click').style.display = "none";
-// })
-
-// paymentBlock2.addEventListener('mouseover', function(){
-//     document.querySelector('.payment__on-click2').style.display = "block";
-// })
-// paymentBlock2.addEventListener('mouseleave', function(){
-//     document.querySelector('.payment__on-click2').style.display = "none";
-// })
-
-// paymentBlock3.addEventListener('mouseover', function(){
-//     document.querySelector('.payment__on-click3').style.display = "block";
-// })
-// paymentBlock3.addEventListener('mouseleave', function(){
-//     document.querySelector('.payment__on-click3').style.display = "none";
-// })
-
 
 const packageName = document.querySelector('.main-block__package-name-js')
 const valideDate = document.querySelector('.main-block__valid-date-js')
@@ -61,40 +275,35 @@ let today = moment().format('L')
 let tomorrow = moment().add(1, 'days').calendar()
 let week = moment().add(7, 'days').calendar()
 let month = moment().add(1, 'months').calendar()
-console.log(tomorrow)
 
-// let tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000));
-// let oneWeek = new Date(today.getTime() + (7*24 * 60 * 60 * 1000));
-// let oneMonth = new Date(today.getTime() + (30*24 * 60 * 60 * 1000));
+//возвращаемся к первому шагу и очищаем инпут
+const firstStepBlock = document.querySelector('.payment__first-step')
+const stepOneText =  document.querySelector('.payment__text_one')
+const stepTwoText = document.querySelector('.payment__text_two')
+const secondStepGo = document.querySelector('.payment__second-step')
+const backTostepOne = document.querySelector('.step-one')
+const stepTwoError = document.querySelector('.step-two')
+const errorInStep = document.querySelector('.payment__step-error')
 
-    //возвращаемся к первому шагу и очищаем инпут
-    const firstStepBlock = document.querySelector('.payment__first-step')
-    const stepOneText =  document.querySelector('.payment__text_one')
-    const stepTwoText = document.querySelector('.payment__text_two')
-    const secondStepGo = document.querySelector('.payment__second-step')
-    const backTostepOne = document.querySelector('.step-one')
-    const stepTwoError = document.querySelector('.step-two')
-    const errorInStep = document.querySelector('.payment__step-error')
+function clearErrorInput(){
+    errorInStep .innerHTML=''
+}
 
-    function clearErrorInput(){
-        errorInStep .innerHTML=''
-    }
+backTostepOne.addEventListener('click', function(){
+    secondStepGo.style.display = "none";
+    firstStepBlock.style.display = "block";
+    stepOneText.classList.add("payment__text_chosen");
+    stepTwoText.classList.remove("payment__text_chosen");
+})
 
-    backTostepOne.addEventListener('click', function(){
-        secondStepGo.style.display = "none";
-        firstStepBlock.style.display = "block";
-        stepOneText.classList.add("payment__text_chosen");
-        stepTwoText.classList.remove("payment__text_chosen");
-    })
-    function clearInput(){
-        packageName.innerHTML = "";
-        valideDate.innerHTML ="";
-        ExpiryDate.innerHTML="";
-        totalSum.innerHTML=""
-        packageNameonPayment.innerHTML='';
-        totalonPayment.innerHTML='';
-        }
-    
+function clearInput(){
+    packageName.innerHTML = "";
+    valideDate.innerHTML ="";
+    ExpiryDate.innerHTML="";
+    totalSum.innerHTML=""
+    packageNameonPayment.innerHTML='';
+    totalonPayment.innerHTML='';
+}
 
 //все названия, тариффы
 packageNames = ["Premium 1 day", "Premium 1 week", "Premium 1 month"]
@@ -105,66 +314,29 @@ for (let i = 0; i < linesWithColor.length; i++) {
     linesWithColor[i].classList.add('main-block__blue');
 }
 
-
-//наверное можно сократить распределение по пакетам, но я еще не нашла способ
-//первый пакет
-paymentBlock1.addEventListener('click', function(){
-    clearErrorInput()
-    clearInput()
-    firstStepBlock.style.display = "none";
-    stepTwoText.classList.add("payment__text_chosen");
-    stepOneText.classList.remove("payment__text_chosen");
-    secondStepGo.style.display="block"
-    packageNameonPayment.classList.add('payment__change-color')
-    totalonPayment.classList.add('payment__change-color')
+// пакеты
+for (let i = 0; i < blocks.length; i++) {
+    blocks[i].addEventListener('click', function () {
+        clearErrorInput();
+        clearInput();
+        firstStepBlock.style.display = "none";
+        stepTwoText.classList.add("payment__text_chosen");
+        stepOneText.classList.remove("payment__text_chosen");
+        secondStepGo.style.display = "block";
+        packageNameonPayment.classList.add('payment__change-color');
+        totalonPayment.classList.add('payment__change-color');
+        
+        let momentArr = [tomorrow, week, month];
     //все отобразили, заполняем пакет:
-    packageName.innerHTML += ` ${packageNames[0]} `
-    valideDate.innerHTML += ` ${today} `
-    ExpiryDate.innerHTML +=  ` ${tomorrow} `
-    totalSum.innerHTML+= `${tariffs[0]}`
-    packageNameonPayment.innerHTML  += ` ${packageNames[0]} `
-    totalonPayment.innerHTML += `${tariffs[0]}`
-    
-})
+        packageName.innerHTML += ` ${packageNames[i]} `;
+        valideDate.innerHTML += ` ${today} `;
+        ExpiryDate.innerHTML += ` ${momentArr[i]} `;
+        totalSum.innerHTML += `${tariffs[i]}`;
+        packageNameonPayment.innerHTML += ` ${packageNames[i]} `;
+        totalonPayment.innerHTML += `${tariffs[i]}`;
+    });
+}
 
-// второй пакет
-paymentBlock2.addEventListener('click', function(){
-    clearErrorInput()
-    clearInput()
-    firstStepBlock.style.display = "none";
-    stepTwoText.classList.add("payment__text_chosen");
-    stepOneText.classList.remove("payment__text_chosen");
-    secondStepGo.style.display="block"
-    packageNameonPayment.classList.add('payment__change-color')
-    totalonPayment.classList.add('payment__change-color')
-    //все отобразили, заполняем пакет:
-    packageName.innerHTML += ` ${packageNames[1]} `
-    valideDate.innerHTML += ` ${today} `
-    ExpiryDate.innerHTML +=  ` ${week} `
-    totalSum.innerHTML+= `${tariffs[1]}`
-    packageNameonPayment.innerHTML  += ` ${packageNames[1]} `
-    totalonPayment.innerHTML += `${tariffs[1]}`
-})
-
-
-//третий пакет
-paymentBlock3.addEventListener('click', function(){
-    clearErrorInput()
-    clearInput()
-    firstStepBlock.style.display = "none";
-    stepTwoText.classList.add("payment__text_chosen");
-    stepOneText.classList.remove("payment__text_chosen");
-    secondStepGo.style.display="block"
-    packageNameonPayment.classList.add('payment__change-color')
-    totalonPayment.classList.add('payment__change-color')
-    //все отобразили, заполняем пакет:
-    packageName.innerHTML += ` ${packageNames[2]} `
-    valideDate.innerHTML += ` ${today} `
-    ExpiryDate.innerHTML +=  ` ${month} `
-    totalSum.innerHTML+= `${tariffs[2]}`
-    packageNameonPayment.innerHTML  += ` ${packageNames[2]} `
-    totalonPayment.innerHTML += `${tariffs[2]}`
-})
 stepTwoError.addEventListener('click', function(){
     if (secondStepGo.style.display === "none") {
         clearErrorInput()
@@ -174,7 +346,6 @@ stepTwoError.addEventListener('click', function(){
 })
 
 //выбираем платежную систему
-
 const momoPay = document.getElementById('momo');
 const paypalPay = document.getElementById('paypals');
 const visaPay = document.getElementById('visa');
@@ -199,41 +370,30 @@ function clearSelected(){
     zalopayTab.classList.remove('active')
     visaTab.ariaSelected= "false";
     visaTab.classList.remove('active')
-
 }
 
 buttonConfirm.addEventListener('click', function(){
     clearSelected()
-if (momoPay.checked ) {
-    momoTab.ariaSelected= "true";
-    momoTab.classList.add('active')
-}
-else if (paypalPay.checked ) {
-    paypalTab.ariaSelected= "true";
-    paypalTab.classList.add('active')
-}
-else if (zaloPay.checked ) {
-    zalopayTab.ariaSelected= "true";
-    zalopayTab.classList.add('active')
-}
-else if (visaPay.checked ) {
-    visaTab.ariaSelected= "true";
-    visaTab.classList.add('active')
-}
+    if (momoPay.checked ) {
+        momoTab.ariaSelected= "true";
+        momoTab.classList.add('active')
+    }
+    else if (paypalPay.checked ) {
+        paypalTab.ariaSelected= "true";
+        paypalTab.classList.add('active')
+    }
+    else if (zaloPay.checked ) {
+        zalopayTab.ariaSelected= "true";
+        zalopayTab.classList.add('active')
+    }
+    else if (visaPay.checked ) {
+        visaTab.ariaSelected= "true";
+        visaTab.classList.add('active')
+    }
 })
 
-//выделяются все
-// Array.from(pays).forEach((elem) => {
-//     if (elem.checked) {
-//         Array.from(tabs).forEach((e) => {
-//             e.ariaSelected="true";
-//             e.classList.add('active')
-//         })
-//     }
-// })
 
 //валидация карты
-
 const confirmPayment = document.querySelector('.bank__button-confirm')
 const inputName =  document.getElementById('input__border')
 const inputCard = document.getElementById('input__border2')
@@ -255,52 +415,48 @@ function checkName(inputName) {
 }
 function checkCard (inputCard) {
     let cardno = /^(?:4[0-9]{12}(?:[0-9]{3})?)$/;
-    if(inputCard.value.match(cardno))
-            {
+    if(inputCard.value.match(cardno)) {
         return true;
-            }
-        else
-            {
-        paymentErrors.classList.add('payment-errors__style')
-        paymentErrors.innerHTML="Неверный номер карты Visa"
-            return false;
-            }
     }
+    else {
+        paymentErrors.classList.add('payment-errors__style')
+        paymentErrors.innerHTML="Неверный номер карты Visa";
+        return false;
+    }
+}
+
 function checkExpDate (ExpDate) {
     let date =/^((0[1-9])|(1[0-2]))\/((2009)|(20[1-2][0-9]))$/;
-    if(ExpDate.value.match(date))
-            {
+    if(ExpDate.value.match(date)) {
         return true;
-            }
-        else
-            {
-                paymentErrors.classList.add('payment-errors__style')
-                paymentErrors.innerHTML="Неверный expiration date"
-            return false;
-            }
     }
-    function checkCvc (cvc) {
-        let correctCvc =/^[0-9]{3}$/;
-        if(cvc.value.match(correctCvc))
-                {
-            return true;
-                }
-            else
-                {
-                    paymentErrors.classList.add('payment-errors__style')
-                    paymentErrors.innerHTML="Неверный cvc"
-                return false;
-                }
-        }
+    else {
+        paymentErrors.classList.add('payment-errors__style')
+        paymentErrors.innerHTML="Неверный expiration date";
+        return false;
+    }
+}
 
-    //проверяем все условия  и отправляем на сервер методом POST
+function checkCvc (cvc) {
+    let correctCvc =/^[0-9]{3}$/;
+    if(cvc.value.match(correctCvc)) {
+        return true;
+    }
+    else {
+        paymentErrors.classList.add('payment-errors__style')
+        paymentErrors.innerHTML = "Неверный cvc";
+        return false;
+    }
+}
+
+//проверяем все условия  и отправляем на сервер методом POST
 confirmPayment.addEventListener('click', function(){
 if (visaTab.classList.contains('active')){
     if (checkName(inputName)) {
         if(checkCard(inputCard) ) {
             if(checkExpDate(ExpDate) ){
                 if(checkCvc(cvc)){
-                    paymentErrors.innerHTML=""
+                    paymentErrors.innerHTML = ""
 
                     let user = {
                         userName : inputName.value,
@@ -330,7 +486,81 @@ if (visaTab.classList.contains('active')){
 }})
 
 
-},{"moment":2}],2:[function(require,module,exports){
+},{"moment":6}],5:[function(require,module,exports){
+/*      AUTHORIZATION CHANGE        */
+
+let button = document.querySelector(".login-form__btn");
+let form = document.querySelector('#login__form');
+let inputField = document.querySelectorAll('input');
+let closeButton = document.querySelector('.js-close-button');
+let haveAccount = document.querySelector('.have-account');
+
+let errors = [];
+
+haveAccount.addEventListener('click', ()=>{
+    window.location.href = '../index.html';
+});
+
+closeButton.addEventListener('click', ()=>{
+    window.location.href = '../htmls/main.html';
+});
+
+//Проверка для каждого поля (поля получаем по одному в функции ниже в цикле)
+function checkValidity(input) {
+    let validity = input.validity;
+    let inpName = input.name;
+
+    if (input.value == "") {
+        errors.push(`Поле ${inpName} не заполнено`); }
+
+    if (validity.patternMismatch) 
+		{ errors.push(`Неверный формат заполнения ${inpName}`); }
+    
+		if (validity.tooLong) 
+		{ let maxlength = input.maxLength;
+			errors.push(`Слишком длинное значение ${inpName}! Максимальная длина:  ` + maxlength + `<br>`); }
+    
+		if (validity.tooShort) 
+		{ let minlength = input.minLength;
+			errors.push(`Слишком короткое значение ${inpName}! Минимальная длина: ` + minlength + `<br>`); }
+
+        if (validity = false) {
+            alert('Welcome!');
+        }
+}
+
+button.addEventListener('click', ()=>{
+//Проверка для всех полей
+	//получаем все инпуты
+    let inputs = document.querySelectorAll("input");
+
+    regexp = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/gi; 
+
+	//перебираем их и на каждый вызываем функцию валидации
+    for (let input of inputs) {
+        //console.log(input);
+        checkValidity(input);
+    }
+
+    if (!document.getElementById("email__input").value.match(regexp)) {
+        errors.push(`${document.getElementById("email__input").name} некорректно`);
+    }
+
+	//выводим ошибки в div 
+    let errorDiv = document.querySelector('.errors__info');
+    errorDiv.innerHTML = errors.join('\n');
+
+    if (errors.length == 0) {
+        alert(`Welcome, ${document.getElementById("email__input").value}`);
+        location.reload();//перезагружаем страницу, если всё введено корректно, 
+        //чтобы очистить поля для дальнейшего ввода
+        window.location.href = '../htmls/main.html';
+    }
+
+    errors = []; //чистим массив
+
+});
+},{}],6:[function(require,module,exports){
 //! moment.js
 //! version : 2.29.4
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -6017,4 +6247,4 @@ if (visaTab.classList.contains('active')){
 
 })));
 
-},{}]},{},[1]);
+},{}]},{},[5,4,3,2,1]);
